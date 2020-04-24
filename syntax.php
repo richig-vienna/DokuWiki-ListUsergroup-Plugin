@@ -51,7 +51,7 @@ class syntax_plugin_listusergroup extends DokuWiki_Syntax_Plugin {
 		list($syntax, $match) = explode('>', substr( strtolower($match), 0, -2), 2); // strip markup
 
 		$options = [];
-		$optionParts = explode('|', $match);
+		$optionParts = explode(';', $match);
 		foreach ($optionParts as $optionPart) {
 			list($key,$optiontxt) = explode('=', $optionPart,2);
 			$options[trim($key)] = explode(',', $optiontxt);
