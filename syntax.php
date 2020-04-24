@@ -25,7 +25,7 @@ class syntax_plugin_listusergroup extends DokuWiki_Syntax_Plugin {
     /**
      * @return int Sort order - Low numbers go before high numbers
      */
-    public function getSort() { return 155; }
+    public function getSort() { return 65; }
 
     /**
      * Connect lookup pattern to lexer.
