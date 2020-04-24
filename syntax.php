@@ -49,6 +49,8 @@ class syntax_plugin_listusergroup extends DokuWiki_Syntax_Plugin {
      */
     public function handle($match, $state, $pos, Doku_Handler $handler) {
 		list($syntax, $match) = explode('>', substr( strtolower($match), 0, -2), 2); // strip markup
+		dbglog('function handle: got match:'.$match);
+
 
 		$options = [];
 		$optionParts = explode(';', $match);
@@ -74,6 +76,7 @@ class syntax_plugin_listusergroup extends DokuWiki_Syntax_Plugin {
 		if ($mode == 'xhtml') {
 			if ($my =& plugin_load('helper', 'listusergroup'))
 				$renderer->doc .= $my->getXHTML($data);
+				dbglog('function render: $renderer->doc:'.$renderer->doc);
 			return true;
 		}
 		return false;
