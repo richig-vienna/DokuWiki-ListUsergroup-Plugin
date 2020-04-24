@@ -41,6 +41,8 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
         global $auth;
         global $lang;
 
+		dbglog('function _getListAsString: start');
+
 		$renderer = new Doku_Renderer_xhtml();
 
         if (!method_exists($auth,"retrieveUsers")) return '';
@@ -51,6 +53,7 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
         $users = array();
 	
 		/* handle user groups */
+		dbglog('function _getListAsString: handle user groups');
         foreach ($data['group'] as $grp) {
             $getuser = $auth->retrieveUsers(0,-1,array('grps'=>'^'.preg_quote($grp,'/').'$'));
             $users = array_merge($users,$getuser);			
@@ -62,6 +65,7 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
         $renderer->doc .= '<table class="'.$tableclass.'">';
 
 		/* handle table header*/
+		dbglog('function _getListAsString: handle table header');
 		if (in_array('header', $data['show'])) {
 		    $renderer->doc .= '<tr>';
 			foreach ($data['show'] as $show) {
@@ -72,6 +76,7 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 		}
 
 		/* handle table body*/
+		dbglog('function _getListAsString: handle table body');
 		$pos = array_search('home', $data['show']) <=> array_search('user', $data['show']);
 		$isShowHome = in_array('home', $data['show']);
 		$isLinkUser = in_array('user', $data['link']);
@@ -85,8 +90,9 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 
             	$renderer->doc .= '<td>';
 
-				/* handle user option */
+				/* handle user option */				
 				if ($show=='user') {
+					dbglog('function _getListAsString: handle user option');
 					if ($isShowHome && $pos<0) $renderer->doc .= ' <span '.$confHomeicon.'></span> ';
 					if ($isLinkUser) {
 						$renderer->internallink($confNS.":".$user);
@@ -97,10 +103,14 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 				}
 
 				/* handle fullname option */
-				if ($show=='fullname') $renderer->doc .= hsc($info['name']);
+				if ($show=='fullname') {
+					dbglog('function _getListAsString: handle fullname option');
+					$renderer->doc .= hsc($info['name']);
+				}
 
 				/* handle email option */
 				if ($show=='email') {
+					dbglog('function _getListAsString: handle email option');
 					if ($isLinkEmail) {
 						$renderer->emaillink($info['mail']);
 					} else {
