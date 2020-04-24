@@ -28,13 +28,21 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
     return $result;
   }
 
-	  /**
-	   * Returns the XHTML of a user list
-	   */
-	  function getXHTML($data) {
 
+    /**
+     * Constructor loads default config settings once
+     */
+    function helper_plugin_listusergroup() {
+        $this->defaults['namespace']  = $this->getConf('namespace');
+        $this->defaults['homeicon']   = $this->getConf('homeicon');
+	}
+
+	/**
+	 * Returns the XHTML of a user list
+	 */
+	function getXHTML($data) {
 		return $src = $this->_getListAsString($data);
-	  }
+	}
 
 
 	function _getListAsString($data) {
@@ -43,7 +51,15 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 
 		dbglog('function _getListAsString: start');
 
-		$renderer = new Doku_Renderer_xhtml();
+		//require_once DOKU_INC . 'inc/parser/xhtml.php';
+		//$xhtml_renderer = new Doku_Renderer_xhtml();
+
+		$xhtml_renderer = NULL;
+		if (is_null($xhtml_renderer)) {
+			require_once DOKU_INC . 'inc/parser/xhtml.php';
+			$xhtml_renderer = new Doku_Renderer_xhtml();
+		}
+
 
         if (!method_exists($auth,"retrieveUsers")) return '';
 
@@ -62,17 +78,17 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 		$tableclass = $data['class']?$data['class'][0]: 'inline';
 
 		/* possible table classes: inline, pagelist, htCore, ul, diff */
-        $renderer->doc .= '<table class="'.$tableclass.'">';
+        $xhtml_renderer->doc .= '<table class="'.$tableclass.'">';
 
 		/* handle table header*/
 		dbglog('function _getListAsString: handle table header');
 		if (in_array('header', $data['show'])) {
-		    $renderer->doc .= '<tr>';
+		    $xhtml_renderer->doc .= '<tr>';
 			foreach ($data['show'] as $show) {
 				if ($show=='home' || $show=='header') continue; 
-				$renderer->doc .= '<th>'.$lang[$show].'</th>';
+				$xhtml_renderer->doc .= '<th>'.$lang[$show].'</th>';
 			}
-		    $renderer->doc .= '</tr>';
+		    $xhtml_renderer->doc .= '</tr>';
 		}
 
 		/* handle table body*/
@@ -82,47 +98,47 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 		$isLinkUser = in_array('user', $data['link']);
 		$isLinkEmail = in_array('email', $data['link']);
         foreach ($users as $user => $info) {
-            $renderer->doc .= '<tr>';
+            $xhtml_renderer->doc .= '<tr>';
 
 			foreach ($data['show'] as $show) {
 				/* skip home and header option */
 				if ($show=='home' || $show=='header') continue;
 
-            	$renderer->doc .= '<td>';
+            	$xhtml_renderer->doc .= '<td>';
 
 				/* handle user option */				
 				if ($show=='user') {
 					dbglog('function _getListAsString: handle user option');
-					if ($isShowHome && $pos<0) $renderer->doc .= ' <span '.$confHomeicon.'></span> ';
+					if ($isShowHome && $pos<0) $xhtml_renderer->doc .= ' <span '.$confHomeicon.'></span> ';
 					if ($isLinkUser) {
-						$renderer->internallink($confNS.":".$user);
+						$xhtml_renderer->doc .= $xhtml_renderer->internallink($confNS.":".$user,null,null,true);
 					} else {
-						$renderer->doc .= hsc($user);
+						$xhtml_renderer->doc .= hsc($user);
 					}
-					if ($isShowHome && $pos>0) $renderer->doc .= ' <span '.$confHomeicon.'></span> ';
+					if ($isShowHome && $pos>0) $xhtml_renderer->doc .= ' <span '.$confHomeicon.'></span> ';
 				}
 
 				/* handle fullname option */
 				if ($show=='fullname') {
 					dbglog('function _getListAsString: handle fullname option');
-					$renderer->doc .= hsc($info['name']);
+					$xhtml_renderer->doc .= hsc($info['name']);
 				}
 
 				/* handle email option */
 				if ($show=='email') {
 					dbglog('function _getListAsString: handle email option');
 					if ($isLinkEmail) {
-						$renderer->emaillink($info['mail']);
+						$xhtml_renderer->doc .= $xhtml_renderer->emaillink($info['mail'],null,null,true);
 					} else {
-						$renderer->doc .= hsc($info['mail']);
+						$xhtml_renderer->doc .= hsc($info['mail']);
 					}
 				}
-				$renderer->doc .= '</td>';
+				$xhtml_renderer->doc .= '</td>';
 			}
-            $renderer->doc .= '</tr>';
+            $xhtml_renderer->doc .= '</tr>';
         }
-        $renderer->doc .= '</table>';
-        return $renderer->doc;
+        $xhtml_renderer->doc .= '</table>';
+        return $xhtml_renderer->doc;
     }
 }
 
