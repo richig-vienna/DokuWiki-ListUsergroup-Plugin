@@ -34,7 +34,7 @@ class syntax_plugin_listusergroup extends DokuWiki_Syntax_Plugin {
      */
     public function connectTo($mode) {
 
-         $this->Lexer->addSpecialPattern('\{\{listusergroup\>.+?\}\}',$mode,'plugin_listusergroup');
+         $this->Lexer->addSpecialPattern('{{listusergroup>[^}]+}}',$mode,'plugin_listusergroup');
     }
 
     /**
