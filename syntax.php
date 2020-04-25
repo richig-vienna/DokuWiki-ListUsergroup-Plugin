@@ -1,6 +1,6 @@
 <?php
 /**
- * DokuWiki Plugin listusergroup (Syntax Component)
+ * DokuWiki Plugin Listusergroup (Syntax Component)
  *
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  * @author  Richard Gfrerer <richard.gfrerer@gmx.net>
@@ -25,7 +25,7 @@ class syntax_plugin_listusergroup extends DokuWiki_Syntax_Plugin {
     /**
      * @return int Sort order - Low numbers go before high numbers
      */
-    public function getSort() { return 161; }
+    public function getSort() { return 160; }
 
     /**
      * Connect lookup pattern to lexer.
@@ -49,7 +49,6 @@ class syntax_plugin_listusergroup extends DokuWiki_Syntax_Plugin {
      */
     public function handle($match, $state, $pos, Doku_Handler $handler) {
 		list($syntax, $match) = explode('>', substr( strtolower($match), 0, -2), 2); // strip markup
-		dbglog('function handle: got match:'.$match);
 
 
 		$options = [];
@@ -75,9 +74,7 @@ class syntax_plugin_listusergroup extends DokuWiki_Syntax_Plugin {
     public function render($mode, Doku_Renderer $renderer, $data){
 		if ($mode == 'xhtml') {
 			if ($my =& plugin_load('helper', 'listusergroup'))
-				// $renderer->doc .= 
-				$my->getXHTML($renderer, $data);
-				dbglog('function render: $renderer->doc:'.$renderer->doc);
+				$renderer->doc .= $my->getXHTML($data);
 			return true;
 		}
 		return false;

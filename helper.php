@@ -1,6 +1,6 @@
 <?php
 /**
- * DokuWiki Plugin listusergroup (Helper Component)
+ * DokuWiki Plugin Listusergroup (Helper Component)
  *
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  * @author  Richard Gfrerer <richard.gfrerer@gmx.net>
@@ -40,26 +40,19 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 	/**
 	 * Returns the XHTML of a user list
 	 */
-	function getXHTML(Doku_Renderer $renderer, $data) {
-		return $src = $this->_getListAsString($renderer, $data);
+	function getXHTML($data) {
+		return $src = $this->_getListAsString($data);
 	}
 
 
-	function _getListAsString(Doku_Renderer $xhtml_renderer, $data) {
+	function _getListAsString($data) {
         global $auth;
         global $lang;
 
-		dbglog('function _getListAsString: start');
-
-		//require_once DOKU_INC . 'inc/parser/xhtml.php';
-		//$xhtml_renderer = new Doku_Renderer_xhtml();
-
-		/*
 		if (is_null($xhtml_renderer)) {
 			require_once DOKU_INC . 'inc/parser/xhtml.php';
 			$xhtml_renderer = new Doku_Renderer_xhtml();
 		}
-		*/
 
 
         if (!method_exists($auth,"retrieveUsers")) return '';
@@ -70,7 +63,6 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
         $users = array();
 	
 		/* handle user groups */
-		dbglog('function _getListAsString: handle user groups');
         foreach ($data['group'] as $grp) {
             $getuser = $auth->retrieveUsers(0,-1,array('grps'=>'^'.preg_quote($grp,'/').'$'));
             $users = array_merge($users,$getuser);			
@@ -82,52 +74,64 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
         $xhtml_renderer->doc .= '<table class="'.$tableclass.'">';
 
 		/* handle table header*/
-		dbglog('function _getListAsString: handle table header');
 		if (in_array('header', $data['show'])) {
 		    $xhtml_renderer->doc .= '<tr>';
 			foreach ($data['show'] as $show) {
-				if ($show=='home' || $show=='header') continue; 
+				if (substr( $show, 0, strlen('existing') ) === "existing") $show = substr($show, strlen('existing'));
+				if ($show==='home' || $show==='header') continue;				
 				$xhtml_renderer->doc .= '<th>'.$lang[$show].'</th>';
 			}
 		    $xhtml_renderer->doc .= '</tr>';
 		}
 
 		/* handle table body*/
-		dbglog('function _getListAsString: handle table body');
-		$pos = array_search('home', $data['show']) <=> array_search('user', $data['show']);
+		$posHome = array_search('home', $data['show']);
+		$posUser = array_search('user', $data['show']);
+		$iconPos = -1;
+		if ($posHome>$posUser) $iconPos = 1;
+
+		$isShowExistingHome = in_array('existinghome', $data['show']);
 		$isShowHome = in_array('home', $data['show']);
 		$isLinkUser = in_array('user', $data['link']);
 		$isLinkEmail = in_array('email', $data['link']);
+		
+
         foreach ($users as $user => $info) {
+			$exists = true;
+			/* skip non-existing hompage entries, if defined */
+			if ($isShowExistingHome) {
+				$exists = null;
+				$usertmp = $user; // user obj will be manipulated by 'resolve_pageid'
+				resolve_pageid($confNS,$usertmp,$exists);
+				if (!$exists) continue;
+			}
+
             $xhtml_renderer->doc .= '<tr>';
 
 			foreach ($data['show'] as $show) {
-				/* skip home and header option */
-				if ($show=='home' || $show=='header') continue;
+				/* skip home and header option (do not create a column) */
+				if ($show==='home' || $show==='existinghome' || $show==='header') continue;
 
             	$xhtml_renderer->doc .= '<td>';
 
 				/* handle user option */				
-				if ($show=='user') {
-					dbglog('function _getListAsString: handle user option');
-					if ($isShowHome && $pos<0) $xhtml_renderer->doc .= ' <span '.$confHomeicon.'></span> ';
+				if ($show==='user') {
+					if ( ($isShowHome||$isShowExistingHome) && $iconPos<0) $xhtml_renderer->doc .= ' <span '.$confHomeicon.'></span> ';
 					if ($isLinkUser) {
-						$xhtml_renderer->doc .= $xhtml_renderer->internallink($confNS.":".$user);
+						$xhtml_renderer->doc .= $xhtml_renderer->internallink($confNS.':'.$user);
 					} else {
 						$xhtml_renderer->doc .= hsc($user);
 					}
-					if ($isShowHome && $pos>0) $xhtml_renderer->doc .= ' <span '.$confHomeicon.'></span> ';
+					if ( ($isShowHome||$isShowExistingHome) && $iconPos>0) $xhtml_renderer->doc .= ' <span '.$confHomeicon.'></span> ';
 				}
 
 				/* handle fullname option */
-				if ($show=='fullname') {
-					dbglog('function _getListAsString: handle fullname option');
+				if ($show==='fullname') {
 					$xhtml_renderer->doc .= hsc($info['name']);
 				}
 
 				/* handle email option */
-				if ($show=='email') {
-					dbglog('function _getListAsString: handle email option');
+				if ($show==='email') {
 					if ($isLinkEmail) {
 						$xhtml_renderer->doc .= $xhtml_renderer->emaillink($info['mail']);
 					} else {
