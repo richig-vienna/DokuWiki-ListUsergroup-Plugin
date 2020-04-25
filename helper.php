@@ -40,12 +40,12 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 	/**
 	 * Returns the XHTML of a user list
 	 */
-	function getXHTML($data) {
-		return $src = $this->_getListAsString($data);
+	function getXHTML(Doku_Renderer $renderer, $data) {
+		return $src = $this->_getListAsString($renderer, $data);
 	}
 
 
-	function _getListAsString($data) {
+	function _getListAsString(Doku_Renderer $xhtml_renderer, $data) {
         global $auth;
         global $lang;
 
@@ -54,11 +54,12 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 		//require_once DOKU_INC . 'inc/parser/xhtml.php';
 		//$xhtml_renderer = new Doku_Renderer_xhtml();
 
-		$xhtml_renderer = NULL;
+		/*
 		if (is_null($xhtml_renderer)) {
 			require_once DOKU_INC . 'inc/parser/xhtml.php';
 			$xhtml_renderer = new Doku_Renderer_xhtml();
 		}
+		*/
 
 
         if (!method_exists($auth,"retrieveUsers")) return '';
@@ -111,7 +112,7 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 					dbglog('function _getListAsString: handle user option');
 					if ($isShowHome && $pos<0) $xhtml_renderer->doc .= ' <span '.$confHomeicon.'></span> ';
 					if ($isLinkUser) {
-						$xhtml_renderer->doc .= $xhtml_renderer->internallink($confNS.":".$user,null,null,true);
+						$xhtml_renderer->doc .= $xhtml_renderer->internallink($confNS.":".$user);
 					} else {
 						$xhtml_renderer->doc .= hsc($user);
 					}
@@ -128,7 +129,7 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 				if ($show=='email') {
 					dbglog('function _getListAsString: handle email option');
 					if ($isLinkEmail) {
-						$xhtml_renderer->doc .= $xhtml_renderer->emaillink($info['mail'],null,null,true);
+						$xhtml_renderer->doc .= $xhtml_renderer->emaillink($info['mail']);
 					} else {
 						$xhtml_renderer->doc .= hsc($info['mail']);
 					}
