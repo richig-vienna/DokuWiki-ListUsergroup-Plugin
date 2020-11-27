@@ -92,6 +92,7 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 
 		$isShowExistingHome = in_array('existinghome', $data['show']);
 		$isShowHome = in_array('home', $data['show']);
+                $isShowGroups = in_array('groups', $data['show']);
 		$isLinkUser = in_array('user', $data['link']);
 		$isLinkEmail = in_array('email', $data['link']);
 		
@@ -124,6 +125,13 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 					}
 					if ( ($isShowHome||$isShowExistingHome) && $iconPos>0) $xhtml_renderer->doc .= ' <span '.$confHomeicon.'></span> ';
 				}
+
+				/* handle groups option */
+				if ($show==='groups') {
+					if ($isShowGroups) {
+						$xhtml_renderer->doc .= hsc(implode( ", ", $info['grps']));
+					}
+				}	
 
 				/* handle fullname option */
 				if ($show==='fullname') {
