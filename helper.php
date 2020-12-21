@@ -93,8 +93,8 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 		$isShowExistingHome = in_array('existinghome', $data['show']);
 		$isShowHome = in_array('home', $data['show']);
                 $isShowGroups = in_array('groups', $data['show']);
-		$isLinkUser = in_array('user', $data['link']);
-		$isLinkEmail = in_array('email', $data['link']);
+		$isLinkUser = $data['link']?in_array('user', $data['link']):false;
+		$isLinkEmail = $data['link']?in_array('email', $data['link']):false;
 		
 
         foreach ($users as $user => $info) {
