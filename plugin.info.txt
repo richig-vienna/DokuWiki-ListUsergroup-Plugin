@@ -1,7 +1,7 @@
 base   listusergroup
 author Richard Gfrerer
 email  richard.gfrerer@gmx.net
-date   2020-04-25
+date   2020-12-21
 name   listusergroup plugin
 desc   Displays the users from one or more groups with optional link to homepage.
 url    http://www.dokuwiki.org/plugin:listusergroup
