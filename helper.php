@@ -65,7 +65,7 @@ class helper_plugin_listusergroup extends DokuWiki_Plugin {
 		/* handle user groups */
         foreach ($data['group'] as $grp) {
             $getuser = $auth->retrieveUsers(0,-1,array('grps'=>'^'.preg_quote($grp,'/').'$'));
-            $users = array_merge($users,$getuser);			
+            $users = $users + $getuser;			
         }
 
 		$tableclass = $data['class']?$data['class'][0]: 'inline';
